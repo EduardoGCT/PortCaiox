@@ -26,12 +26,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Animação do Slider Principal (Hero)
     const slides = document.querySelectorAll('.slide');
-    if (slides.length > 0) {
+    const paginationDots = document.getElementById('pagination-dots');
+
+    if (slides.length > 0 && paginationDots) {
         let currentSlide = 0;
-        setInterval(() => {
+
+        const updateActiveDot = (currentIndex) => {
+            paginationDots.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+                dot.setAttribute('aria-current', index === currentIndex ? 'true' : 'false');
+            });
+        };
+
+        const goToSlide = (slideIndex) => {
+            if (slideIndex < 0 || slideIndex >= slides.length) {
+                return;
+            }
+
             slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
+            currentSlide = slideIndex;
             slides[currentSlide].classList.add('active');
+            updateActiveDot(currentSlide);
+        };
+
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('button');
+            dot.type = 'button';
+            dot.className = 'dot';
+            dot.setAttribute('aria-label', `Ir para o slide ${index + 1}`);
+            dot.addEventListener('click', () => goToSlide(index));
+            paginationDots.appendChild(dot);
+        });
+
+        updateActiveDot(currentSlide);
+
+        setInterval(() => {
+            goToSlide((currentSlide + 1) % slides.length);
         }, 5000); // Troca de foto a cada 5 segundos
     }
 
